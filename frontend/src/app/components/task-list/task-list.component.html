@@ -1,0 +1,150 @@
+<div class="row mb-3">
+  <div class="col">
+    <h2>I Miei Task</h2>
+  </div>
+  <div class="col text-end">
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <i class="bi bi-plus-circle"></i> Nuovo Task
+    </button>
+  </div>
+</div>
+
+<!-- Filtri e Ricerca -->
+<div class="card mb-4">
+  <div class="card-body">
+    <div class="row g-3">
+      <div class="col-md-6">
+        <input type="text" class="form-control" placeholder="🔍 Cerca per titolo o descrizione..."
+          [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" />
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" [(ngModel)]="filterStatus" (change)="onFilterChange()">
+          <option value="ALL">Tutti gli stati</option>
+          <option value="TODO">TODO</option>
+          <option value="IN_PROGRESS">IN PROGRESS</option>
+          <option value="DONE">DONE</option>
+        </select>
+      </div>
+      <div class="col-md-3">
+        <select class="form-select" [(ngModel)]="filterPriority" (change)="onFilterChange()">
+          <option value="ALL">Tutte le priorità</option>
+          <option value="LOW">LOW</option>
+          <option value="MEDIUM">MEDIUM</option>
+          <option value="HIGH">HIGH</option>
+        </select>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Lista Task -->
+<div class="row">
+  <div class="col-md-4 mb-3" *ngFor="let task of filteredTasks">
+    <div class="card h-100 shadow-sm">
+      <div class="card-body">
+        <h5 class="card-title">{{ task.title }}</h5>
+        <p class="card-text text-muted">{{ task.description || 'Nessuna descrizione' }}</p>
+
+        <div class="mb-2">
+          <span class="badge bg-{{getStatusBadge(task.status)}} me-2">{{ task.status }}</span>
+          <span class="badge bg-{{getPriorityBadge(task.priority)}}">{{ task.priority }}</span>
+        </div>
+
+        <div class="mb-2" *ngIf="task.dueDate">
+          <small class="text-muted">📅 Scadenza: {{ task.dueDate | date:'dd/MM/yyyy' }}</small>
+        </div>
+
+        <div class="mb-3" *ngIf="task.tags.length > 0">
+          <span class="badge bg-info text-dark me-1" *ngFor="let tag of task.tags">{{ tag }}</span>
+        </div>
+
+        <div class="btn-group w-100" role="group">
+          <button class="btn btn-sm btn-outline-primary" (click)="openEditModal(task)">Modifica</button>
+          <button class="btn btn-sm btn-outline-danger" (click)="deleteTask(task.id!)">Elimina</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="alert alert-info text-center" *ngIf="filteredTasks.length === 0 && tasks.length === 0">
+  📝 Nessun task trovato. Crea il tuo primo task!
+</div>
+
+<div class="alert alert-warning text-center" *ngIf="filteredTasks.length === 0 && tasks.length > 0">
+  🔍 Nessun task corrisponde ai filtri selezionati.
+</div>
+
+<!-- Modal -->
+<div class="modal fade" [class.show]="showModal" [style.display]="showModal ? 'block' : 'none'" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">{{ editMode ? '✏️ Modifica Task' : '➕ Nuovo Task' }}</h5>
+        <button type="button" class="btn-close" (click)="closeModal()"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label for="title" class="form-label">Titolo *</label>
+            <input type="text" class="form-control" id="title" [(ngModel)]="newTask.title" name="title" required>
+          </div>
+
+          <div class="mb-3">
+            <label for="description" class="form-label">Descrizione</label>
+            <textarea class="form-control" id="description" [(ngModel)]="newTask.description" name="description"
+              rows="3"></textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-4 mb-3">
+              <label for="status" class="form-label">Stato</label>
+              <select class="form-select" id="status" [(ngModel)]="newTask.status" name="status">
+                <option value="TODO">TODO</option>
+                <option value="IN_PROGRESS">IN PROGRESS</option>
+                <option value="DONE">DONE</option>
+              </select>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="priority" class="form-label">Priorità</label>
+              <select class="form-select" id="priority" [(ngModel)]="newTask.priority" name="priority">
+                <option value="LOW">LOW</option>
+                <option value="MEDIUM">MEDIUM</option>
+                <option value="HIGH">HIGH</option>
+              </select>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="dueDate" class="form-label">Scadenza</label>
+              <input type="date" class="form-control" id="dueDate" [(ngModel)]="newTask.dueDate" name="dueDate">
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Tags</label>
+            <div class="input-group mb-2">
+              <input type="text" class="form-control" placeholder="Aggiungi un tag..." [(ngModel)]="tagInput"
+                name="tagInput" />
+              <button class="btn btn-outline-secondary" type="button" (click)="addTag()">Aggiungi</button>
+            </div>
+            <div>
+              <span class="badge bg-info text-dark me-1 mb-1" *ngFor="let tag of newTask.tags" style="cursor: pointer;"
+                (click)="removeTag(tag)">
+                {{ tag }} ✕
+              </span>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">Annulla</button>
+        <button type="button" class="btn btn-primary" (click)="saveTask()">
+          {{ editMode ? 'Aggiorna' : 'Crea' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop fade" [class.show]="showModal" *ngIf="showModal"></div>

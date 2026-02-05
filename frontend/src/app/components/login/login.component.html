@@ -1,0 +1,31 @@
+<div class="container-fluid vh-100 d-flex align-items-center justify-content-center bg-primary bg-gradient">
+  <div class="card shadow-lg" style="width: 400px;">
+    <div class="card-body p-4">
+      <h1 class="text-center mb-4">Login</h1>
+
+      <form (ngSubmit)="onSubmit()">
+        <div class="mb-3">
+          <label for="email" class="form-label">Email</label>
+          <input type="email" class="form-control" id="email" [(ngModel)]="email" name="email" required
+            placeholder="mario.rossi@email.com" />
+        </div>
+
+        <div class="mb-3">
+          <label for="password" class="form-label">Password</label>
+          <input type="password" class="form-control" id="password" [(ngModel)]="password" name="password" required
+            placeholder="••••••••" />
+        </div>
+
+        <div class="alert alert-danger" role="alert" *ngIf="error">
+          {{ error }}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 mb-3">Accedi</button>
+      </form>
+
+      <p class="text-center mb-0">
+        Non hai un account? <a routerLink="/register" class="text-decoration-none">Registrati</a>
+      </p>
+    </div>
+  </div>
+</div>
