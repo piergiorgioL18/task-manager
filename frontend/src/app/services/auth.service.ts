@@ -7,7 +7,7 @@ import { AuthResponse, LoginDto, RegisterDto } from '../models/auth.model';
   providedIn: 'root'
 })
 export class AuthService {
-  private apiUrl = 'http://localhost:3000/auth';
+  private apiUrl = 'https://task-manager-production-515f.up.railway.app/auth';
 
   constructor(private http: HttpClient) { }
 
