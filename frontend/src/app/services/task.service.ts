@@ -7,7 +7,7 @@ import { CreateTaskDto, Task, UpdateTaskDto } from '../models/task.model';
   providedIn: 'root'
 })
 export class TaskService {
-  private apiUrl = 'https://task-manager-production-515f.up.railway.app/auth/tasks';
+  private apiUrl = 'https://task-manager-production-515f.up.railway.app/tasks';
 
   constructor(private http: HttpClient) { }
 
